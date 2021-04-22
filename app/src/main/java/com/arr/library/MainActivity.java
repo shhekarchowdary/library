@@ -2,6 +2,7 @@ package com.arr.library;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +11,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,8 +19,8 @@ public class MainActivity extends AppCompatActivity {
     Button mAdd, mMyList;
 
     HashMap<String,Double> dataMap = new HashMap<>();
-    //HashMap<String,Double> addedBooks = new HashMap<>();
-    ArrayList<String> addedBooks = new ArrayList<>();
+    public static HashMap<String,Double> addedBooks = new HashMap<>();
+    //public static ArrayList<String> addedBooks = new ArrayList<>();
 
     String selectedBook = "";
 
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        myListView = findViewById(R.id.listView1);
+        myListView = findViewById(R.id.addedList);
         mAdd = findViewById(R.id.button1);
         mMyList = findViewById(R.id.button2);
 
@@ -50,27 +50,49 @@ public class MainActivity extends AppCompatActivity {
                 if(!selectedBook.isEmpty()){
                     boolean flag = true;
                     if(addedBooks.size() >= 1){
-                        for(String s: addedBooks){
+                        for(String s: addedBooks.keySet()){
                             if(s.equalsIgnoreCase(selectedBook)){
                                 flag = false;
+                                break;
                             }
                         }
                         if(flag){
                             Log.d("tag1","in added book");
-                            addedBooks.add(selectedBook);
+                            for(String s: dataMap.keySet()){
+                                if(s.equalsIgnoreCase(selectedBook)){
+                                    addedBooks.put(s,dataMap.get(s));
+                                    break;
+                                }
+                            }
                             Toast.makeText(getBaseContext(),"Book added to List",Toast.LENGTH_LONG).show();
                         }else
                             Toast.makeText(getBaseContext(),"Book Already in List",Toast.LENGTH_LONG).show();
 
                     }else{
+                        for(String s: dataMap.keySet()){
+                            if(s.equalsIgnoreCase(selectedBook)){
+                                addedBooks.put(selectedBook,dataMap.get(s));
+                                break;
+                            }
+                        }
                         Toast.makeText(getBaseContext(),"Book added to List",Toast.LENGTH_LONG).show();
-                        addedBooks.add(selectedBook);
                     }
                 }
                 else{
                     Log.d("tag1","in book");
                     Toast.makeText(getBaseContext(),"Please Select Book",Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        mMyList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(addedBooks.size()>=1){
+                    Intent i = new Intent(getBaseContext(),MainActivity2.class);
+                    startActivity(i);
+                }else
+                    Toast.makeText(getBaseContext(),"Your List is Empty Please add some Books",Toast.LENGTH_LONG).show();
             }
         });
     }

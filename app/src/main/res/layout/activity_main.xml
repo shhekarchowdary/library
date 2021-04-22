@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <ListView
-        android:id="@+id/listView1"
+        android:id="@+id/addedList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="10dp"
@@ -32,7 +32,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listView1">
+        app:layout_constraintTop_toBottomOf="@+id/addedList">
 
         <Button
             android:id="@+id/button1"
