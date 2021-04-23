@@ -4,120 +4,85 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.Spinner;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class MainActivity extends AppCompatActivity {
 
     ListView myListView;
-    Button mAdd, mMyList;
+    Spinner mSpinner;
 
-    HashMap<String,Double> dataMap = new HashMap<>();
-    public static HashMap<String,Double> addedBooks = new HashMap<>();
-    //public static ArrayList<String> addedBooks = new ArrayList<>();
+    ArrayList<Book> mBooks = new ArrayList<>();
+    ArrayList<String> mCategory = new ArrayList<>();
+    ArrayList<Book> mCategoryBooks = new ArrayList<>();
 
-    String selectedBook = "";
+    public static Book selectedBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         myListView = findViewById(R.id.addedList);
-        mAdd = findViewById(R.id.button1);
-        mMyList = findViewById(R.id.button2);
+        mSpinner = findViewById(R.id.spinner);
 
         fillData();
 
-        CustomAdapter listAdapter = new CustomAdapter(getApplicationContext(),dataMap);
-        myListView.setAdapter(listAdapter);
+        for(Book book:mBooks){
+            mCategory.add(book.getCategory());
+        }
+        mCategory = new ArrayList<>(new LinkedHashSet<>(mCategory));
+
+        ArrayAdapter spinnerAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, mCategory);
+        mSpinner.setAdapter(spinnerAdapter);
+
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String categorySelected = mCategory.get(i);
+                mCategoryBooks.clear();
+                for(Book book:mBooks){
+                    if(book.getCategory().equalsIgnoreCase(categorySelected)){
+                        mCategoryBooks.add(book);
+                    }
+                }
+                CustomAdapter listAdapter = new CustomAdapter(getApplicationContext(),mCategoryBooks);
+                myListView.setAdapter(listAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
 
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedBook = String.valueOf(dataMap.keySet().toArray()[i]);
+                selectedBook = mCategoryBooks.get(i);
+                Intent intent = new Intent(getBaseContext(),MainActivity3.class);
+                startActivity(intent);
             }
         });
 
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!selectedBook.isEmpty()){
-                    boolean flag = true;
-                    if(addedBooks.size() >= 1){
-                        for(String s: addedBooks.keySet()){
-                            if(s.equalsIgnoreCase(selectedBook)){
-                                flag = false;
-                                break;
-                            }
-                        }
-                        if(flag){
-                            Log.d("tag1","in added book");
-                            for(String s: dataMap.keySet()){
-                                if(s.equalsIgnoreCase(selectedBook)){
-                                    addedBooks.put(s,dataMap.get(s));
-                                    break;
-                                }
-                            }
-                            Toast.makeText(getBaseContext(),"Book added to List",Toast.LENGTH_LONG).show();
-                        }else
-                            Toast.makeText(getBaseContext(),"Book Already in List",Toast.LENGTH_LONG).show();
-
-                    }else{
-                        for(String s: dataMap.keySet()){
-                            if(s.equalsIgnoreCase(selectedBook)){
-                                addedBooks.put(selectedBook,dataMap.get(s));
-                                break;
-                            }
-                        }
-                        Toast.makeText(getBaseContext(),"Book added to List",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else{
-                    Log.d("tag1","in book");
-                    Toast.makeText(getBaseContext(),"Please Select Book",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        mMyList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(addedBooks.size()>=1){
-                    Intent i = new Intent(getBaseContext(),MainActivity2.class);
-                    startActivity(i);
-                }else
-                    Toast.makeText(getBaseContext(),"Your List is Empty Please add some Books",Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     public void fillData(){
-        dataMap.put("Book1",100.0);
-        dataMap.put("Book2",100.0);
-        dataMap.put("Book3",99.0);
-        dataMap.put("Book4",1000.0);
-        dataMap.put("Book5",899.0);
-        dataMap.put("Book6",233.0);
-        dataMap.put("Book7",67.0);
-        dataMap.put("Book8",167.0);
-        dataMap.put("Book9",876.0);
-        dataMap.put("Book10",1238.0);
-        dataMap.put("Book11",675.0);
-        dataMap.put("Book12",455.0);
-        dataMap.put("Book13",87.0);
-        dataMap.put("Book14",34.0);
-        dataMap.put("Book15",34.0);
-        dataMap.put("Book16",12.0);
-        dataMap.put("Book17",65.0);
-        dataMap.put("Book18",35.0);
-        dataMap.put("Book19",67.0);
-        dataMap.put("Book20",45.0);
+        mBooks.add(new Book("8173666024","Java","Kathy Sierra","Computer"));
+        mBooks.add(new Book("9789351194095","Android Development","Pradeep Kothari","Computer"));
+        mBooks.add(new Book("1789139864","Swift5","Jon Hoffman","Computer"));
+        mBooks.add(new Book("B01LKBOAPS","Spoken English in Dialogues","Julia Deniskina","English"));
+        mBooks.add(new Book("B01N6Z7N78","English Literature","William J. Long ","English"));
+        mBooks.add(new Book("B08423R6J2","Descriptive English","SP Bakshi","English"));
+        mBooks.add(new Book("085750357X","Black Holes The Reith Lectures","Stephen Hawking","Science"));
+        mBooks.add(new Book("145160713X","For the Love of Physics","Walter Lewin","Science"));
+        mBooks.add(new Book("8172344880","The Origin of Species","Charles Darwin","Science"));
     }
 
 }
